@@ -4,10 +4,9 @@ import { getDb } from '$lib/db';
 import mongoose from 'mongoose';
 // @ts-ignore
 import Papa from 'papaparse';
+import Data from '$lib/models/Data';
 
 console.log('API endpoint loaded');
-
-const Data = mongoose.model('Data', new mongoose.Schema({}, { strict:false }), 'data');
 
 export const OPTIONS: RequestHandler = async () => {
   return new Response(null, {
@@ -37,7 +36,7 @@ export const POST: RequestHandler = async ({ request }) => {
       const rawCsv = await request.text();
       dataToInsert = Papa.parse(rawCsv, {
         header: true, // Use first row as keys
-        skipEmptyLines: true, // Ignore empty lines
+        skipEmptyLines: true,
         transform: (value, field) => {
           // Auto-convert numeric strings to numbers
           return isNaN(Number(value)) ? value : Number(value);

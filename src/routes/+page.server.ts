@@ -1,8 +1,7 @@
 import type { PageServerLoad } from './$types';
 import { getDb } from '$lib/db';
 import mongoose from 'mongoose';
-
-const Data = mongoose.model('Data', new mongoose.Schema({}, { strict: false }), 'data');
+import Data from '$lib/models/Data';
 
 export const load: PageServerLoad = async () => {
   console.time('db-connect');
