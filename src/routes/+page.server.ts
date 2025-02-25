@@ -11,8 +11,7 @@ export const load: PageServerLoad = async () => {
   console.log('Page load started, DB state:', mongoose.connection.readyState);
   try {
     console.time('query');
-    const rawData = await Data.find()
-      .limit(10) // Keep your limit
+    const rawData = await Data.find() // Keep your limit
       .lean(); // Returns plain JS objects
     console.timeEnd('query');
 
