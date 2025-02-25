@@ -1,8 +1,8 @@
 import type { PageServerLoad } from './$types';
 import Data from '$lib/models/Data';
+import { getDb } from '$lib/db';
+import mongoose from 'mongoose';
 import type { LeanDataType } from '$lib/models/Data';
-import db from '$lib/db';
-
 
 interface DataItem {
   id: number;
@@ -13,20 +13,29 @@ interface DataItem {
 }
 
 export const load: PageServerLoad = async () => {
-    console.log('Page load started, DB state:', db.readyState);
-    try {
-      const rawData = await Data.find().lean() as unknown as LeanDataType[];
-      const data: DataItem[] = rawData.map(item => ({
-        id: item.id,
-        name: item.name,
-        value: item.value,
-        createdAt: item.createdAt,
-        updatedAt: item.updatedAt
-      }));
-      console.log('Data fetched:', data);
-      return { data };
-    } catch (error) {
-      console.error('Error loading data:', error);
-      return { data: [], error: 'Failed to load data from MongoDB' };
-    }
-  };
+  console.time('db-connect');
+  await getDb(); // Ensure connection
+  console.timeEnd('db-connect');
+
+  console.log('Page load started, DB state:', mongoose.connection.readyState);
+  try {
+    console.time('query');
+    const rawData = await Data.find()
+      .limit(10) // Add limit to reduce load
+      .lean() as LeanDataType[];
+    console.timeEnd('query');
+
+    const data: DataItem[] = rawData.map(item => ({
+      id: item.id,
+      name: item.name,
+      value: item.value,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+    }));
+    console.log('Data fetched:', data.length, 'items');
+    return { data };
+  } catch (error) {
+    console.error('Error loading data:', error);
+    return { data: [], error: 'Failed to load data from MongoDB' };
+  }
+};
