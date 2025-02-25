@@ -5,5 +5,5 @@
     export let data: PageData;
   </script>
   
-  <h1>Data from CSV</h1>
+  <h1>Imported Data</h1>
   <DataTable data={data.data} />
