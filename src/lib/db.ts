@@ -4,11 +4,14 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const MONGODB_URI = process.env.MONGODB_URI as string;
+
+console.log('MONGODB_URI raw value:', JSON.stringify(process.env.MONGODB_URI));
+
 if (!MONGODB_URI) {
     throw new Error('MONGODB_URI is not defined in .env');
 }
 
-console.log("Mongodb URI: " + MONGODB_URI);
+console.log('Mongodb URI (sanitized):', MONGODB_URI.replace(/:.*@/, ':****@'));
 
 let cachedConnection: typeof mongoose | null = null;
 
@@ -20,9 +23,8 @@ export async function getDb() {
   
     console.log('Connecting to MongoDB, state:', mongoose.connection.readyState);
     cachedConnection = await mongoose.connect(MONGODB_URI, {
-      // Optional: Tweak for serverless
-      bufferCommands: false, // Avoid buffering if disconnected
-      serverSelectionTimeoutMS: 5000, // Fail fast if no server
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 5000, 
     });
     console.log('MongoDB connected, state:', mongoose.connection.readyState);
     return cachedConnection;
