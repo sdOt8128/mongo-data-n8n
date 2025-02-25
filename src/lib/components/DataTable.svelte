@@ -1,7 +1,7 @@
 <script lang="ts">
   export let data: any[] = [];
   let headers: string[] = [];
-
+// Pointless comment for git commit.
   $: {
     // Dynamically update headers based on the first row's keys
     headers = data.length > 0 ? Object.keys(data[0]) : [];
