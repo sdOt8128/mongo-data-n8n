@@ -11,14 +11,12 @@ export const load: PageServerLoad = async () => {
   console.log('Page load started, DB state:', mongoose.connection.readyState);
   try {
     console.time('query');
-    const rawData = await Data.find() // Keep your limit
+    const rawData = await Data.find()
+      .select('-_id -__v')
       .lean(); // Returns plain JS objects
     console.timeEnd('query');
 
-    const data = rawData.map(item => ({
-      ...item,
-      _id: item._id?.toString(), // Convert ObjectId to string
-    }));
+    const data = rawData;
 
     console.log('Data fetched:', data.length, 'items');
     return { data };
